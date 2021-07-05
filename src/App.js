@@ -1,33 +1,40 @@
-import { useState, useMemo } from 'react'
-import { FilesViewer } from './FilesViewer'
-import Button from './components/Button';
-const electron = window.require('electron');
-const remote = electron.remote;
-const {dialog} = remote
-
-const fs = window.require('fs')
-const pathModule = window.require('path')
-
-const { app } = window.require('@electron/remote')
-
-async function selectPicturesFolder(setPicturesFolder){
-  const dialogChoice = await dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory', 'promptToCreate'] });
-  const path = dialogChoice.filePaths[0];
-  setPicturesFolder(path);
-}
+import GlobalStyles from './styles/GlobalStyles';
+import TagsPanel from './components/TagsPanel/TagsPanel';
+import CurrentImage from './contexts/CurrentImage';
+import styled from 'styled-components';
+import ImagePanel from './components/ImagePanel/ImagePanel';
+import {useState, useRef, useEffect} from 'react';
+import Images from './contexts/Images';
 
 function App() {
-  const [picturesFolder, setPicturesFolder] = useState(null);
+  const [highResImages, setHighResImages] = useState({});
+  const [lowResImages, setLowResImages] = useState({});
+  const [currentImage, setCurrentImage] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
+  const [lastTag, setLastTag] = useState([]);
+  const [tags, setTags] = useState({})
+  const inputRef = useRef(null);
+
+  useEffect(()=>{
+    const row = document.querySelector(`#${currentImage}`);
+    row?.scrollIntoView({behavior:"smooth", block:"nearest"});
+  },[currentImage]);
 
   return (
-    <div className="container mt-2">
-      <Button 
-        variant="primary"
-        onClick={()=>selectPicturesFolder(setPicturesFolder)}
-      >Select pictures folder</Button>
-      <h4>{picturesFolder}</h4>
-    </div>
-  )
+    <CurrentImage.Provider value={{currentImage, setCurrentImage, currentIndex, setCurrentIndex}}>
+      <Images.Provider value={{lastTag, setLastTag, tags, setTags, lowResImages, setLowResImages, highResImages, setHighResImages}}>
+        <GlobalStyles />
+        <TopWrapper>
+          <ImagePanel inputRef={inputRef}/>
+          <TagsPanel inputRef={inputRef}/>
+        </TopWrapper>
+      </Images.Provider>
+    </CurrentImage.Provider>
+  );
 }
 
 export default App;
+
+const TopWrapper = styled.main`
+  display: flex;
+`;

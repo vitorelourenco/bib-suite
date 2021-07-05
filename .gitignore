@@ -7,6 +7,9 @@
 
 # testing
 /coverage
+/testfolder
+/high
+/low
 
 # production
 /build

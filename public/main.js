@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, protocol } = require('electron')
 
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -8,11 +8,13 @@ require('@electron/remote/main').initialize()
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    title: "BIB Suite",
+    minWidth: 800,
+    minHeight: 700,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      webSecurity: false
     }
   })
 
@@ -20,10 +22,23 @@ function createWindow() {
     isDev
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`
-  )
+  );
+
+  // win.setMenu(null);
 }
 
-app.on('ready', createWindow)
+app.on('ready', ()=>{
+  createWindow();
+  protocol.registerFileProtocol('file', (request, cb) => {
+    const url = request.url.replace('file:///', '')
+    const decodedUrl = decodeURI(url)
+    try {
+      return cb(decodedUrl)
+    } catch (error) {
+      console.error('ERROR: registerLocalResourceProtocol: Could not get file path:', error)
+    }
+  })
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
