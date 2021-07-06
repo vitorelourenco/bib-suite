@@ -8,26 +8,48 @@ import CurrentImage from '../../contexts/CurrentImage'
 import Images from '../../contexts/Images'
 import BibList from './BibList'
 import { Button } from '../Button'
+import ConfirmationModal from './ConfirmationModal'
+const fs = window.require('fs');
 
 export default function TagsPanel({inputRef}) {
-  const {lastTag} = useContext(Images)
+  const {lastTag, tags} = useContext(Images)
   const [picturesList, setPicturesList] = useState([]);
   const {currentImage} = useContext(CurrentImage);
+  const [CSVFile, setCSVFile] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
+  function saveToFile(){
+    const keys = Object.keys(tags);
+    let CSVString = "";
+    keys.forEach(key=>{
+      CSVString += [key, ...tags[key]].join(";") + ";\r\n"
+    })
+    CSVString += "\r\n"
+    fs.writeFileSync(CSVFile, CSVString);
+  }
+  
   return (
     <TopWrapper>
       <FSConfig
-        setPicturesList={setPicturesList}
+        setPicturesList={setPicturesList} setCSVFile={setCSVFile} CSVFile={CSVFile}
       />
       <PicturesList inputRef={inputRef} picturesList={picturesList} />
       <p className="current-image">{currentImage}</p>
       <BibInput ref={inputRef} picturesList={picturesList}/>
       {lastTag?.length ? <p className="last-tag">spacebar sets:<br/> {lastTag.join(" ; ")}</p> : ""}
       <BibList></BibList>
-      <Button className="export" variant="include">Export CSV</Button>
+      <Button onClick={()=>setShowConfirmation(true)} className="export" variant="include">Save to current SVG</Button>
+      {showConfirmation ? (
+        <ConfirmationModal CSVFile={CSVFile} saveToFile={saveToFile} setShowConfirmation={setShowConfirmation} />
+      ) : (
+        ""
+      )}
+    
     </TopWrapper>
   )
 }
+
+
 
 const TopWrapper = styled.div`
   height: 100vh;

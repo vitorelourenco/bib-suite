@@ -10,7 +10,7 @@ const pathModule = window.require('path')
 
 const jpgRegExp = new RegExp(/(.jpg$)|(.JPG$)|(.jpeg$)|(.JPEG$)/);
 
-export default function FSConfig({setPicturesList}){
+export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
   const {lowResImages, setLowResImages, setHighResImages, tags, setTags} = useContext(Images);
   const {currentImage, setCurrentImage} = useContext(CurrentImage);
 
@@ -18,7 +18,6 @@ export default function FSConfig({setPicturesList}){
   
   const [srcDir, setSrcDir] = useState("");
   const [highResDir, setHighResDir] = useState("");
-  const [CSVFile, setCSVFile] = useState("");
 
   useEffect(()=>{
     const lowResPaths = getJPEGsFromFolder(srcDir);

@@ -5,6 +5,9 @@ import styled from 'styled-components';
 import ImagePanel from './components/ImagePanel/ImagePanel';
 import {useState, useRef, useEffect} from 'react';
 import Images from './contexts/Images';
+import Modal from "react-modal";
+
+Modal.setAppElement(document.querySelector("#root"));
 
 function App() {
   const [highResImages, setHighResImages] = useState({});
