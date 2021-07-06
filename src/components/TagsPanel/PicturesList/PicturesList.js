@@ -2,7 +2,7 @@ import styled from "styled-components";
 import TagRow from './TagRow';
 export default function PicturesList({inputRef, picturesList}){
   return(
-    <TopWrapper onClick={()=>inputRef?.current.focus()}>
+    <TopWrapper onClick={()=>document.querySelector("#input-box").focus()}>
       {picturesList.map(p=><TagRow picturesList={picturesList} key={p} picture={p}/>)}
     </TopWrapper>
   );

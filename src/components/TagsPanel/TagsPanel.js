@@ -22,7 +22,7 @@ export default function TagsPanel({inputRef}) {
       <PicturesList inputRef={inputRef} picturesList={picturesList} />
       <p className="current-image">{currentImage}</p>
       <BibInput ref={inputRef} picturesList={picturesList}/>
-      {lastTag?.length ? <p className="last-tag">spacebar sets: {lastTag.join(" ; ")}</p> : ""}
+      {lastTag?.length ? <p className="last-tag">spacebar sets:<br/> {lastTag.join(" ; ")}</p> : ""}
       <BibList></BibList>
       <Button className="export" variant="include">Export CSV</Button>
     </TopWrapper>

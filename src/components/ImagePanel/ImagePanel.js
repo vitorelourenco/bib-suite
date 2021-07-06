@@ -17,7 +17,7 @@ export default function ImagePanel({ inputRef }) {
   const lowResFolder = document.querySelector(".FSOptions--lowResDir-show")?.textContent;
 
   return (
-    <TopWrapper onClick={() => inputRef.current.focus()}>
+    <TopWrapper onClick={() => document.querySelector("#input-box").focus()}>
       {
         (()=>{
           if(Object.keys(tags).length < 1){

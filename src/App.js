@@ -17,7 +17,7 @@ function App() {
 
   useEffect(()=>{
     const row = document.querySelector(`#${currentImage}`);
-    row?.scrollIntoView({behavior:"smooth", block:"nearest"});
+    row?.scrollIntoView({block:"nearest"});
   },[currentImage]);
 
   return (

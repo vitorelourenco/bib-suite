@@ -1,12 +1,14 @@
 import styled from 'styled-components'
-import { useContext, forwardRef } from 'react'
+import { useContext, forwardRef, useMemo } from 'react'
 import CurrentImage from '../../contexts/CurrentImage'
 import Images from '../../contexts/Images'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import { useState } from 'react'
-const BibInput = forwardRef(({ picturesList }, ref) => {
+
+export default function BibInput({picturesList}){
   const [value, setValue] = useState('')
+  const [clock, setClock] = useState(true);
 
   const {
     currentImage,
@@ -16,37 +18,74 @@ const BibInput = forwardRef(({ picturesList }, ref) => {
   } = useContext(CurrentImage)
   const { lastTag, setLastTag, tags, setTags } = useContext(Images)
 
+  function addTag(value) {
+    if (tags[currentImage].includes(value)) {
+      setValue('')
+      return
+    }
+    if (value !== '') {
+      tags[currentImage].push(value)
+      setTags({ ...tags })
+    } else {
+      if (tags[currentImage].length > 0) setLastTag([...tags[currentImage]])
+      next(currentIndex, picturesList.length - 1)
+    }
+    setValue('')
+  }
+
+  
+  const okTime = useMemo(()=>{
+    return Date.now();
+  },[clock])
+
   function handleKeyDown(e) {
     switch (e.key) {
       case 'ArrowRight': {
         e.preventDefault()
-        if (e.repeat) return
+        if (e.repeat) {
+          const timeAtRepeat = Date.now();
+          if (timeAtRepeat-okTime > 25){
+            next(currentIndex, picturesList.length - 1)
+            setClock(!clock)
+          }
+          return
+        }
+
         next(currentIndex, picturesList.length - 1)
         break
       }
       case 'ArrowLeft': {
         e.preventDefault()
-        if (e.repeat) return
+        if (e.repeat) {
+          const timeAtRepeat = Date.now();
+          if (timeAtRepeat-okTime > 25){
+            previous(currentIndex, picturesList.length - 1)
+            setClock(!clock)
+          }
+          return
+        }
+
         previous(currentIndex, picturesList.length - 1)
         break
       }
       case 'Enter': {
-        if (tags[currentImage].includes(value)) {
-          return
+        const node = document.querySelector('#input-box')
+        const isBoxOpen = !!node.getAttribute('aria-activedescendant')
+        console.log(isBoxOpen)
+        if (isBoxOpen) return
+        if (value === '' || Number.isInteger(parseFloat(value))) return addTag(value)
+        if (galeries.map(galery=>galery.code).includes(value)) addTag(value)
+        else {
+          node.style.outline = "2px solid red";
+          setTimeout(()=>{
+            node.style.outline = "none";
+          }, 300)
         }
-        if (value !== '') {
-          tags[currentImage].push(value)
-          setTags({ ...tags })
-        } else {
-          setLastTag([...tags[currentImage]])
-          next(currentIndex, picturesList.length - 1)
-        }
-        setValue('')
         break
       }
       case ' ': {
-        e.preventDefault()
-        if (lastTag !== []) {
+        if (!/[a-z]/i.test(value)) e.preventDefault()
+        if (lastTag.length !== 0 && value === '') {
           tags[currentImage] = [...lastTag]
           setTags({ ...tags })
           next(currentIndex, picturesList.length - 1)
@@ -66,22 +105,20 @@ const BibInput = forwardRef(({ picturesList }, ref) => {
   }
 
   // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-  const top100Films = [
-    { title: 'The Shawshank Redemption', year: 1994 },
-    { title: 'The Godfather', year: 1972 },
-    { title: 'The Godfather: Part II', year: 1974 },
-    { title: 'The Dark Knight', year: 2008 },
-    { title: '12 Angry Men', year: 1957 },
-    { title: "Schindler's List", year: 1993 },
-    { title: 'Pulp Fiction', year: 1994 },
-    { title: 'The Lord of the Rings: The Return of the King', year: 2003 },
-    { title: 'The Good, the Bad and the Ugly', year: 1966 },
-    { title: 'Fight Club', year: 1999 },
-    { title: 'The Lord of the Rings: The Fellowship of the Ring', year: 2001 },
-    { title: 'Star Wars: Episode V - The Empire Strikes Back', year: 1980 },
-    { title: 'Forrest Gump', year: 1994 },
-    { title: 'Inception', year: 2010 },
-    { title: 'The Lord of the Rings: The Two Towers', year: 2002 }
+  const galeries = [
+    {
+      title: 'Specialized',
+      code: 'specialized',
+      display: 'Specialized - specialized'
+    },
+    { title: 'Pinarello', code: 'pinarello', display: 'Pinarello - pinarello' },
+    { title: 'Touca Azul', code: 'ninaazu', display: 'Touca Azul - ninaazu' },
+    {
+      title: 'Equipe Elite',
+      code: 'eqpelite',
+      display: 'Equipe Elite - qpelite'
+    },
+    { title: 'Somos Do Bem', code: 'dubem', display: 'Somos do Bom - dubem' }
   ]
 
   function next(i, len) {
@@ -96,20 +133,43 @@ const BibInput = forwardRef(({ picturesList }, ref) => {
     setCurrentImage(picturesList[currentIndex - 1])
   }
 
+  const options = /[a-z]/i.test(value)
+    ? galeries.map(option => option.display)
+    : []
+
   return (
     <>
-      <TopWrapper
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        ref={ref}
+      <Autocomplete
+        className="bib-input-box"
+        id="input-box"
+        freeSolo
+        disableClearable
+        autoHighlight={true}
+        options={options}
+        inputValue={value}
+        onInputChange={(e, val) => {
+          if (!e) return
+          if (e.type === 'change') setValue(val)
+          if (e.type === 'click') {
+            const galery = galeries.find(galery => galery.display === val)
+            addTag(galery.code)
+          }
+          if (e.key === 'Enter') {
+            const galery = galeries.find(galery => galery.display === val)
+            addTag(galery.code)
+          }
+        }}
         onKeyDown={e => handleKeyDown(e)}
+        renderInput={params => (
+          <TextField
+            focused={true}
+            {...params}
+            label="bib or galery"
+            margin="dense"
+            variant="standard"
+          />
+        )}
       />
     </>
   )
-})
-
-const TopWrapper = styled.input`
-  width: 100%;
-`
-
-export default BibInput
+}
