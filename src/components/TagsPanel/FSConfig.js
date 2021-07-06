@@ -1,5 +1,5 @@
 import { Button, LeftButton, RightButton } from '../Button';
-import { getDirAsync, saveFilePathAsync, getJPEGsFromFolder, getCSVPathAsync} from '../../helper_functions/fileHandling';
+import { getDirAsync, saveFilePathAsync, getJPEGsFromFolder, getCSVPathAsync, bareCSVfile} from '../../helper_functions/fileHandling';
 import { useContext, useState, useEffect} from 'react';
 import Images from '../../contexts/Images';
 import styled from 'styled-components';
@@ -73,7 +73,7 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
         <Button
           className="FSOptions--lowResDir-set"
           variant="primary"
-          onClick={() => getDirAsync().then(dir=>dir.setWith(setSrcDir))}
+          onClick={() => getDirAsync().then(dir=>{if(dir) setSrcDir(dir)})}
         >
           Set <strong>low res</strong> jpg dir
         </Button>
@@ -83,7 +83,7 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
           className="FSOptions--highResDir"
           disabled={srcDir?false:true}
           variant="primary"
-          onClick={() => getDirAsync().then(dir=>dir.setWith(setHighResDir))}
+          onClick={() => getDirAsync().then(dir=>{if(dir) setHighResDir(dir)})}
         >
           Set <strong>high res</strong> jpg dir
         </Button>
@@ -95,9 +95,10 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
           onClick={() =>{
             getCSVPathAsync()
             .then(file=>{
-              if (!file) return alert("Invalid File");
+              if (!file) return;
               if (file === CSVFile) return alert("Can't load the same file");
               setCSVFile(file);
+              document.querySelector("#input-box").focus();
             });
           }}
         >
@@ -109,17 +110,11 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
           onClick={() => {
             saveFilePathAsync()
             .then(file=>{
-              fs.writeFileSync(file.file+".csv","");
-              const keys = Object.keys(lowResImages);
-              keys.forEach(key=>{
-                fs.appendFileSync(file.file+".csv", key+";\r\n", (err)=>{
-                  if (err) return console.log(err);
-                });
-              });
-              fs.appendFileSync(file.file+".csv", "\r\n", (err)=>{
-                if (err) return console.log(err);
-              });
-              setCSVFile(file.file+".csv");
+              if (!file) return;
+              if (file === CSVFile) return alert("Can't overwrite the same file");
+              bareCSVfile(file, lowResImages);
+              setCSVFile(file);
+              document.querySelector("#input-box").focus();
             });
           }}
         >

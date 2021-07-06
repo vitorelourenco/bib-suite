@@ -1,6 +1,6 @@
 import 'react-inner-image-zoom/lib/InnerImageZoom/styles.css'
 import InnerImageZoom from 'react-inner-image-zoom'
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import CurrentImage from '../../contexts/CurrentImage'
 import Images from '../../contexts/Images'
 import styled from 'styled-components'
@@ -13,23 +13,28 @@ export default function ImagePanel() {
   const { highResImages, lowResImages } = useContext(Images)
 
   const existsLowRes = fs.existsSync(lowResImages[currentImage])
-  const existsHighRes = fs.existsSync(highResImages[currentImage])
   const lowResFolder = document.querySelector(".FSOptions--lowResDir-show")?.textContent;
+
+  const tagsLength = useMemo(()=>{
+    return Object.keys(tags)?.length;
+  },[tags]);
 
   return (
     <TopWrapper onClick={() => document.querySelector("#input-box").focus()}>
       {
         (()=>{
-          if(Object.keys(tags).length < 1){
+          if(tagsLength < 1){
             if (!lowResFolder) return "Waiting for low res folder..."
             else return "Waiting for CSV list...";
           } else {
+
             if (!existsLowRes){
               return `File ${currentImage} not found in low res folder ${lowResFolder}`;
             } else {
               return (<InnerImageZoom
                 src={'file://' + lowResImages[currentImage]}
-                zoomScale={existsHighRes?1:2.5}
+                zoomScale={2.5}
+                zoomPreload={false}
                 zoomSrc={
                   'file://' +
                   (highResImages[currentImage] || lowResImages[currentImage])

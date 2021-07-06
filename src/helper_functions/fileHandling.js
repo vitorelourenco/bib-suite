@@ -14,8 +14,9 @@ export async function getDirAsync() {
   const dialogChoice = await dialog.showOpenDialog({
     properties: ['openDirectory', 'createDirectory', 'promptToCreate']
   })
-  const dir = dialogChoice?.filePaths[0]
-  return { dir, setWith: callback => dir && callback(dir) }
+  if (dialogChoice.canceled) return "";
+  const dir = dialogChoice.filePaths[0]
+  return dir
 }
 
 export async function saveFilePathAsync() {
@@ -28,8 +29,10 @@ export async function saveFilePathAsync() {
       }
     ]
   })
-  const file = dialogChoice?.filePath && dialogChoice.filePath
-  return { file, setWith: callback => file && callback(file) }
+  if (dialogChoice.canceled) return ""
+  const path = dialogChoice.filePath;
+  if (/.csv$/.test(path)) return path;
+  else return path+'.csv';
 }
 
 export async function getCSVPathAsync(){
@@ -42,6 +45,7 @@ export async function getCSVPathAsync(){
       }
     ]
   });
+  if (dialogChoice.canceled) return "";
   return dialogChoice?.filePaths[0];
 }
 
@@ -58,4 +62,10 @@ export function getJPEGsFromFolder(dir) {
     if (dir === '') return []
     else alert(`Can't load from folder: ${dir}`)
   }
+}
+
+export function bareCSVfile(path, obj){
+  const keys = Object.keys(obj);
+  const str = keys.reduce((acc, item) => acc += item+";\r\n","")
+  fs.writeFileSync(path,str)
 }
