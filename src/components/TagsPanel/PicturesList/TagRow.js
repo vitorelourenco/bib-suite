@@ -1,16 +1,13 @@
 import styled from 'styled-components'
-import { useContext, useRef } from 'react'
-import CurrentImage from '../../../contexts/CurrentImage'
-import Images from '../../../contexts/Images';
+import React, { useRef } from 'react'
 
-export default function TagRow({ picture, picturesList }) {
-  const { currentImage, setCurrentImage, setCurrentIndex } = useContext(CurrentImage);
-  const {tags} = useContext(Images);
+function TagRow(props) {
+  const {setCurrentImage, setCurrentIndex, isCurrentImage, tagsOfPicture, picture, picturesList, tagsString} = props;
   const ref = useRef(null)
 
   return (
     <TopWrapper
-      className={picture === currentImage ? 'current' : 'other'}
+      className={isCurrentImage ? 'current' : 'other'}
       id={picture}
       onClick={() => {
         const image = ref?.current?.textContent
@@ -23,24 +20,28 @@ export default function TagRow({ picture, picturesList }) {
       <p ref={ref} className="left">
         {picture}
       </p>
-      <p className="right">{tags[picture]?.join(";")}</p>
+      <p className="right">{tagsOfPicture?.join(";")}</p>
     </TopWrapper>
   )
 }
+
+const MemoizedTagRow = React.memo(TagRow, (prevProps, nextProps)=>{
+  if (prevProps.isCurrentImage !== nextProps.isCurrentImage) return false;
+  if (prevProps.tagsString !== nextProps.tagsString) return false;
+  return true;
+});
+
+export default MemoizedTagRow;
 
 const TopWrapper = styled.li`
   display: grid;
   grid-template-columns: 18ch 1fr;
   border-bottom: 1px solid #333;
   cursor: pointer;
-  &:hover {
-    font-size: 1.1em;
-  }
 
   &.current {
     background-color: green !important;
     outline: 1px solid orange;
-    font-weight: bold;
   }
 
   .left {

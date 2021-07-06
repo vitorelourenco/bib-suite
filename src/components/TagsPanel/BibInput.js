@@ -51,7 +51,7 @@ export default function BibInput({picturesList}){
         e.preventDefault()
         if (e.repeat) {
           const timeAtRepeat = Date.now();
-          if (timeAtRepeat-okTime > 25){
+          if (timeAtRepeat-okTime > 100){
             next(currentIndex, picturesList.length - 1)
             setClock(!clock)
           }
@@ -65,7 +65,7 @@ export default function BibInput({picturesList}){
         e.preventDefault()
         if (e.repeat) {
           const timeAtRepeat = Date.now();
-          if (timeAtRepeat-okTime > 25){
+          if (timeAtRepeat-okTime > 100){
             previous(currentIndex, picturesList.length - 1)
             setClock(!clock)
           }
@@ -156,7 +156,7 @@ export default function BibInput({picturesList}){
       onKeyDown={e => handleKeyDown(e)}
       renderInput={params => (
         <TextField
-          disable={isDisabled}
+          disabled={isDisabled}
           focused={!isDisabled}
           {...params}
           label="bib or galery"

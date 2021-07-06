@@ -9,47 +9,72 @@ import Images from '../../contexts/Images'
 import BibList from './BibList'
 import { Button } from '../Button'
 import ConfirmationModal from './ConfirmationModal'
-const fs = window.require('fs');
+const fs = window.require('fs')
 
 export default function TagsPanel() {
-  const {lastTag, tags} = useContext(Images)
-  const [picturesList, setPicturesList] = useState([]);
-  const {currentImage} = useContext(CurrentImage);
-  const [CSVFile, setCSVFile] = useState("");
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const { lastTag, tags } = useContext(Images)
+  const [picturesList, setPicturesList] = useState([])
+  const { currentImage, setCurrentImage, setCurrentIndex, currentIndex } = useContext(
+    CurrentImage
+  )
+  const [CSVFile, setCSVFile] = useState('')
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
-  function saveToFile(){
-    const keys = Object.keys(tags);
-    let CSVString = "";
-    keys.forEach(key=>{
-      CSVString += [key, ...tags[key]].join(";") + ";\r\n"
+  function saveToFile() {
+    const keys = Object.keys(tags)
+    let CSVString = ''
+    keys.forEach(key => {
+      CSVString += [key, ...tags[key]].join(';') + ';\r\n'
     })
-    CSVString += "\r\n"
-    fs.writeFileSync(CSVFile, CSVString);
+    CSVString += '\r\n'
+    fs.writeFileSync(CSVFile, CSVString)
   }
-  
+
   return (
     <TopWrapper>
       <FSConfig
-        setPicturesList={setPicturesList} setCSVFile={setCSVFile} CSVFile={CSVFile}
+        setPicturesList={setPicturesList}
+        setCSVFile={setCSVFile}
+        CSVFile={CSVFile}
       />
-      <PicturesList picturesList={picturesList} />
+      <PicturesList
+        setCurrentImage={setCurrentImage}
+        setCurrentIndex={setCurrentIndex}
+        currentIndex={currentIndex}
+        currentImage={currentImage}
+        tags={tags}
+        picturesList={picturesList}
+      />
       <p className="current-image">{currentImage}</p>
-      <BibInput picturesList={picturesList}/>
-      {lastTag?.length ? <p className="last-tag">spacebar sets:<br/> {lastTag.join(" ; ")}</p> : ""}
-      <BibList></BibList>
-      <Button onClick={()=>setShowConfirmation(true)} className="export" variant="include">Save to current CSV</Button>
-      {showConfirmation ? (
-        <ConfirmationModal CSVFile={CSVFile} saveToFile={saveToFile} setShowConfirmation={setShowConfirmation} />
+      <BibInput picturesList={picturesList} />
+      {lastTag?.length ? (
+        <p className="last-tag">
+          spacebar sets:
+          <br /> {lastTag.join(' ; ')}
+        </p>
       ) : (
-        ""
+        ''
       )}
-    
+      <BibList></BibList>
+      <Button
+        onClick={() => setShowConfirmation(true)}
+        className="export"
+        variant="include"
+      >
+        Save to current CSV
+      </Button>
+      {showConfirmation ? (
+        <ConfirmationModal
+          CSVFile={CSVFile}
+          saveToFile={saveToFile}
+          setShowConfirmation={setShowConfirmation}
+        />
+      ) : (
+        ''
+      )}
     </TopWrapper>
   )
 }
-
-
 
 const TopWrapper = styled.div`
   height: 100vh;
@@ -61,7 +86,7 @@ const TopWrapper = styled.div`
     overflow-y: scroll;
   }
 
-  .export{
+  .export {
     position: absolute;
     left: 0;
     bottom: 0px;
@@ -69,7 +94,7 @@ const TopWrapper = styled.div`
     border-radius: 0;
   }
 
-  .last-tag{
+  .last-tag {
     margin-top: 5px;
     margin-bottom: 5px;
     font-size: 12px;
@@ -77,7 +102,7 @@ const TopWrapper = styled.div`
     word-break: break-word;
   }
 
-  .current-image{
+  .current-image {
     margin-top: 10px;
     margin-bottom: 10px;
     text-align: center;
