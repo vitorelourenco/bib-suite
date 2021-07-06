@@ -7,7 +7,7 @@ import styled from 'styled-components'
 
 const fs = window.require('fs')
 
-export default function ImagePanel({ inputRef }) {
+export default function ImagePanel() {
   const { currentImage } = useContext(CurrentImage)
   const { tags } = useContext(Images)
   const { highResImages, lowResImages } = useContext(Images)

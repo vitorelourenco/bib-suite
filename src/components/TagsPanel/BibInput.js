@@ -1,5 +1,4 @@
-import styled from 'styled-components'
-import { useContext, forwardRef, useMemo } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 import CurrentImage from '../../contexts/CurrentImage'
 import Images from '../../contexts/Images'
 import TextField from '@material-ui/core/TextField'
@@ -9,6 +8,8 @@ import { useState } from 'react'
 export default function BibInput({picturesList}){
   const [value, setValue] = useState('')
   const [clock, setClock] = useState(true);
+  const {galeries} = useContext(Images);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const {
     currentImage,
@@ -34,6 +35,12 @@ export default function BibInput({picturesList}){
   }
 
   
+  useEffect(()=>{
+    if (picturesList?.length){
+      setIsDisabled(false);
+    }
+  },[picturesList])
+
   const okTime = useMemo(()=>{
     return Date.now();
   },[clock])
@@ -69,9 +76,9 @@ export default function BibInput({picturesList}){
         break
       }
       case 'Enter': {
+        if (isDisabled) return;
         const node = document.querySelector('#input-box')
         const isBoxOpen = !!node.getAttribute('aria-activedescendant')
-        console.log(isBoxOpen)
         if (isBoxOpen) return
         if (value === '' || Number.isInteger(parseFloat(value))) return addTag(value)
         if (galeries.map(galery=>galery.code).includes(value)) addTag(value)
@@ -104,23 +111,6 @@ export default function BibInput({picturesList}){
     }
   }
 
-  // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-  const galeries = [
-    {
-      title: 'Specialized',
-      code: 'specialized',
-      display: 'Specialized - specialized'
-    },
-    { title: 'Pinarello', code: 'pinarello', display: 'Pinarello - pinarello' },
-    { title: 'Touca Azul', code: 'ninaazu', display: 'Touca Azul - ninaazu' },
-    {
-      title: 'Equipe Elite',
-      code: 'eqpelite',
-      display: 'Equipe Elite - qpelite'
-    },
-    { title: 'Somos Do Bem', code: 'dubem', display: 'Somos do Bom - dubem' }
-  ]
-
   function next(i, len) {
     if (i === len) return
     setCurrentIndex(currentIndex + 1)
@@ -133,43 +123,47 @@ export default function BibInput({picturesList}){
     setCurrentImage(picturesList[currentIndex - 1])
   }
 
+
+
   const options = /[a-z]/i.test(value)
     ? galeries.map(option => option.display)
     : []
 
+
+
   return (
-    <>
-      <Autocomplete
-        className="bib-input-box"
-        id="input-box"
-        freeSolo
-        disableClearable
-        autoHighlight={true}
-        options={options}
-        inputValue={value}
-        onInputChange={(e, val) => {
-          if (!e) return
-          if (e.type === 'change') setValue(val)
-          if (e.type === 'click') {
-            const galery = galeries.find(galery => galery.display === val)
-            addTag(galery.code)
-          }
-          if (e.key === 'Enter') {
-            const galery = galeries.find(galery => galery.display === val)
-            addTag(galery.code)
-          }
-        }}
-        onKeyDown={e => handleKeyDown(e)}
-        renderInput={params => (
-          <TextField
-            focused={true}
-            {...params}
-            label="bib or galery"
-            margin="dense"
-            variant="standard"
-          />
-        )}
-      />
-    </>
+    <Autocomplete
+      className="bib-input-box"
+      id="input-box"
+      freeSolo
+      autoHighlight={true}
+      disableClearable
+      options={options}
+      inputValue={value}
+      onInputChange={(e, val) => {
+        if (isDisabled) return;
+        if (!e) return
+        if (e.type === 'change') setValue(val)
+        if (e.type === 'click') {
+          const galery = galeries.find(galery => galery.display === val)
+          addTag(galery.code)
+        }
+        if (e.key === 'Enter') {
+          const galery = galeries.find(galery => galery.display === val)
+          addTag(galery.code)
+        }
+      }}
+      onKeyDown={e => handleKeyDown(e)}
+      renderInput={params => (
+        <TextField
+          disable={isDisabled}
+          focused={!isDisabled}
+          {...params}
+          label="bib or galery"
+          margin="dense"
+          variant="standard"
+        />
+      )}
+    />
   )
 }

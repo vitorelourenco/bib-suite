@@ -7,6 +7,10 @@ import {useState, useRef, useEffect} from 'react';
 import Images from './contexts/Images';
 import Modal from "react-modal";
 
+const app = window.require('electron').remote.app
+const fs = window.require('fs');
+const path = window.require('path')
+
 Modal.setAppElement(document.querySelector("#root"));
 
 function App() {
@@ -15,6 +19,7 @@ function App() {
   const [currentImage, setCurrentImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [lastTag, setLastTag] = useState([]);
+  const [galeries, setGaleries] = useState([]);
   const [tags, setTags] = useState({})
   const inputRef = useRef(null);
 
@@ -23,9 +28,17 @@ function App() {
     row?.scrollIntoView({block:"nearest"});
   },[currentImage]);
 
+  useEffect(()=>{
+    const config = path.join(`${app.getAppPath()}`, "/config/galeries.json");
+    if (fs.existsSync(config)){
+      const galeries = fs.readFileSync(config);
+      setGaleries(JSON.parse(galeries));
+    }
+  },[])
+
   return (
     <CurrentImage.Provider value={{currentImage, setCurrentImage, currentIndex, setCurrentIndex}}>
-      <Images.Provider value={{lastTag, setLastTag, tags, setTags, lowResImages, setLowResImages, highResImages, setHighResImages}}>
+      <Images.Provider value={{galeries, setGaleries, lastTag, setLastTag, tags, setTags, lowResImages, setLowResImages, highResImages, setHighResImages}}>
         <GlobalStyles />
         <TopWrapper>
           <ImagePanel inputRef={inputRef}/>

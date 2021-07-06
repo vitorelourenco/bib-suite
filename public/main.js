@@ -24,7 +24,7 @@ function createWindow() {
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
 
-  // win.setMenu(null);
+  win.setMenu(null);
 }
 
 app.on('ready', ()=>{
