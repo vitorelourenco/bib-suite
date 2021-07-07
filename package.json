@@ -1,6 +1,6 @@
 {
-  "name": "electron-react",
-  "version": "0.1.0",
+  "name": "bib-suite",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
     "@electron/remote": "^1.0.2",

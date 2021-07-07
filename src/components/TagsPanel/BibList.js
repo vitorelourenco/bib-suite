@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import CurrentImage from '../../contexts/CurrentImage';
-import { useContext, useState, useEffect } from "react";
+import { useContext } from "react";
 import Images from "../../contexts/Images";
 
 export default function BibList(){

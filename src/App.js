@@ -8,11 +8,6 @@ import Images from './contexts/Images';
 import Modal from "react-modal";
 import defaultGaleries from './defaultGaleries';
 
-const app = window.require('electron').remote.app
-const fs = window.require('fs');
-const path = window.require('path')
-const isDev = window.require('electron-is-dev')
-
 Modal.setAppElement(document.querySelector("#root"));
 
 function App() {

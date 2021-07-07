@@ -1,4 +1,3 @@
-import { existsSync, writeFileSync, readFileSync } from 'fs'
 
 const electron = window.require('electron')
 const remote = electron.remote
@@ -6,9 +5,6 @@ const { dialog } = remote
 
 const fs = window.require('fs')
 const pathModule = window.require('path')
-
-const { app } = window.require('@electron/remote')
-const appPath = app.getAppPath()
 
 export async function getDirAsync() {
   const dialogChoice = await dialog.showOpenDialog({
