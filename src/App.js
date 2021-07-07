@@ -6,10 +6,12 @@ import ImagePanel from './components/ImagePanel/ImagePanel';
 import {useState, useRef, useEffect} from 'react';
 import Images from './contexts/Images';
 import Modal from "react-modal";
+import defaultGaleries from './defaultGaleries';
 
 const app = window.require('electron').remote.app
 const fs = window.require('fs');
 const path = window.require('path')
+const isDev = window.require('electron-is-dev')
 
 Modal.setAppElement(document.querySelector("#root"));
 
@@ -29,17 +31,16 @@ function App() {
   },[currentImage]);
 
   useEffect(()=>{
-    const configDev = path.join(app.getAppPath(), "bibConfig");
-    const configProd = path.join(app.getAppPath(), "resources", "bibConfig");
-    const isProd = fs.existsSync(configProd);
-    const config = isProd ? path.join(configProd, "galeries.json") : path.join(configDev, "galeries.json");
-
-    console.log(config);
-    if (fs.existsSync(config)){
-      const galeries = fs.readFileSync(config);
-      setGaleries(JSON.parse(galeries));
+    const lsGaleries = localStorage.getItem("galeries");
+    if (lsGaleries === null){
+      localStorage.setItem("galeries", JSON.stringify(defaultGaleries));
+      setGaleries(defaultGaleries);
+    } else {
+      setGaleries(JSON.parse(lsGaleries));
     }
   },[])
+  console.log(galeries);
+  console.log("banana");
 
   return (
     <CurrentImage.Provider value={{currentImage, setCurrentImage, currentIndex, setCurrentIndex}}>

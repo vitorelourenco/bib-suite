@@ -1,4 +1,4 @@
-[
+const defaultGaleries = [
   {
     "title": "Specialized",
     "code": "specialized", 
@@ -22,3 +22,5 @@
     "display": "Somos do Bom - dubem" 
   }
 ]
+
+export default defaultGaleries; 

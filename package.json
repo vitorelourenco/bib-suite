@@ -45,8 +45,7 @@
     ],
     "directories": {
       "buildResources": "assets"
-    },
-    "extraResources": ["**/bibConfig/*"]
+    }
   },
   "eslintConfig": {
     "extends": [

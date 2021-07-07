@@ -92,7 +92,7 @@ export default function BibInput({picturesList}){
         break
       }
       case ' ': {
-        if (!/[a-z]/i.test(value)) e.preventDefault()
+        if (!/[^0-9]/.test(value)) e.preventDefault()
         if (lastTag.length !== 0 && value === '') {
           tags[currentImage] = [...lastTag]
           setTags({ ...tags })
@@ -126,11 +126,9 @@ export default function BibInput({picturesList}){
 
 
 
-  const options = /[a-z]/i.test(value)
+  const options = /[^0-9]/.test(value)
     ? galeries.map(option => option.display)
     : []
-
-
 
   return (
     <Autocomplete
