@@ -10,14 +10,15 @@ const pathModule = window.require('path')
 
 const jpgRegExp = new RegExp(/(.jpg$)|(.JPG$)|(.jpeg$)|(.JPEG$)/);
 
-export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
-  const {lowResImages, setLowResImages, setHighResImages, setTags} = useContext(Images);
+export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFile}){
+  const {lowResImages, setLowResImages, setHighResImages, tags, setTags} = useContext(Images);
   const {setCurrentImage, setCurrentIndex} = useContext(CurrentImage);
 
   const [isHidden, setIsHidden] = useState(false);
   
   const [srcDir, setSrcDir] = useState("");
   const [highResDir, setHighResDir] = useState("");
+  const [inputCount, setInputCount] = useState(0);
 
   useEffect(()=>{
     const lowResPaths = getJPEGsFromFolder(srcDir);
@@ -74,11 +75,26 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
       setPicturesList(picturesList);
       setCurrentImage(picturesList[0]);
       setCurrentIndex(0);
+      setInputCount(0);
     } catch (err) {
       console.log(err);
       console.log("err at load csv")
     }
   },[CSVFile]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(()=>{
+    setInputCount(inputCount+1);
+  },[tags])
+
+  useEffect(()=>{
+    if (!fs.existsSync(CSVFile)) return;
+    if (inputCount > 10){
+      saveToFile(CSVFile+"2");
+      saveToFile(CSVFile+"backup");
+      fs.unlinkSync(CSVFile+"2");
+      setInputCount(0);
+    }
+  },[inputCount])
 
   return (
     <TopWrapper isHidden={isHidden}>

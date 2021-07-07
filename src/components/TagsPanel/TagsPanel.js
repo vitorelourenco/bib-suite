@@ -20,13 +20,13 @@ export default function TagsPanel() {
   const [CSVFile, setCSVFile] = useState('')
   const [showConfirmation, setShowConfirmation] = useState(false)
 
-  function saveToFile() {
+  function saveToFile(path) {
     const keys = Object.keys(tags)
     let CSVString = ''
     keys.forEach(key => {
       CSVString += [key, ...tags[key]].join(';') + ';\r\n'
     })
-    fs.writeFileSync(CSVFile, CSVString)
+    fs.writeFileSync(path, CSVString)
   }
 
   return (
@@ -35,6 +35,7 @@ export default function TagsPanel() {
         setPicturesList={setPicturesList}
         setCSVFile={setCSVFile}
         CSVFile={CSVFile}
+        saveToFile={saveToFile}
       />
       <PicturesList
         setCurrentImage={setCurrentImage}

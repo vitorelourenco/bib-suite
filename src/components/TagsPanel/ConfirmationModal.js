@@ -33,7 +33,7 @@ export default function CheckoutModal({
       <div>
         <Button
           onClick={() => {
-            saveToFile()
+            saveToFile(CSVFile)
             alert("done");
             setShowConfirmation(false)
           }}
