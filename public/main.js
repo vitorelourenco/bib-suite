@@ -3,12 +3,14 @@ const { app, BrowserWindow, protocol } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
 
+const electron = require('electron')
+
 require('@electron/remote/main').initialize()
 
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    title: "BIB Suite",
+    title: 'BIB Suite',
     minWidth: 800,
     minHeight: 700,
     webPreferences: {
@@ -22,25 +24,40 @@ function createWindow() {
     isDev
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`
-  );
+  )
 
-  if(!isDev){
-    win.setMenu(null);
+  if (!isDev) {
+    win.setMenu(null)
   }
+
+  win.on('close', function (e) {
+    var choice = electron.dialog.showMessageBoxSync(this, {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Confirm',
+      message: 'Unsaved changes will be lost! Quit anyway?'
+    })
+    if (choice === 1) {
+      e.preventDefault();
+    }
+  })
 }
 
-app.on('ready', ()=>{
-  createWindow();
+app.on('ready', () => {
+  createWindow()
   protocol.registerFileProtocol('file', (request, cb) => {
     const url = request.url.replace('file:///', '')
     const decodedUrl = decodeURI(url)
     try {
       return cb(decodedUrl)
     } catch (error) {
-      console.error('ERROR: registerLocalResourceProtocol: Could not get file path:', error)
+      console.error(
+        'ERROR: registerLocalResourceProtocol: Could not get file path:',
+        error
+      )
     }
   })
-});
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

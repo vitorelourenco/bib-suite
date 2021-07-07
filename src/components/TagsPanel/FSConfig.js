@@ -88,10 +88,10 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFi
 
   useEffect(()=>{
     if (!fs.existsSync(CSVFile)) return;
-    if (inputCount > 10){
-      saveToFile(CSVFile+"2");
-      saveToFile(CSVFile+"backup");
-      fs.unlinkSync(CSVFile+"2");
+    if (inputCount > 100){
+      saveToFile(CSVFile+"shadowcopy");
+      saveToFile(CSVFile+"autobackup");
+      fs.unlinkSync(CSVFile+"shadowcopy");
       setInputCount(0);
     }
   },[inputCount])
