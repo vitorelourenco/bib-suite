@@ -12,7 +12,7 @@ const jpgRegExp = new RegExp(/(.jpg$)|(.JPG$)|(.jpeg$)|(.JPEG$)/);
 
 export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
   const {lowResImages, setLowResImages, setHighResImages, tags, setTags} = useContext(Images);
-  const {currentImage, setCurrentImage} = useContext(CurrentImage);
+  const {currentImage, setCurrentImage, setCurrentIndex} = useContext(CurrentImage);
 
   const [isHidden, setIsHidden] = useState(false);
   
@@ -63,8 +63,10 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
       setTags(csvImages);
       setPicturesList(picturesList);
       setCurrentImage(picturesList[0]);
+      setCurrentIndex(0);
     } catch (err) {
       console.log(err);
+      console.log("err at load csv")
     }
   },[CSVFile]); // eslint-disable-line react-hooks/exhaustive-deps
 

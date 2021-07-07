@@ -33,7 +33,6 @@ export default function BibInput({picturesList}){
     }
     setValue('')
   }
-
   
   useEffect(()=>{
     if (picturesList?.length){
@@ -81,7 +80,7 @@ export default function BibInput({picturesList}){
         const node = document.querySelector('#input-box')
         const isBoxOpen = !!node.getAttribute('aria-activedescendant')
         if (isBoxOpen) return
-        if (value === '' || Number.isInteger(parseFloat(value))) return addTag(value)
+        if (value === '' || !/[^0-9]/.test(value)) return addTag(value)
         if (galeries.map(galery=>galery.code).includes(value)) addTag(value)
         else {
           node.style.outline = "2px solid red";
@@ -113,6 +112,7 @@ export default function BibInput({picturesList}){
   }
 
   function next(i, len) {
+    console.log(currentIndex);
     if (i === len) return
     setCurrentIndex(currentIndex + 1)
     setCurrentImage(picturesList[currentIndex + 1])
@@ -148,6 +148,8 @@ export default function BibInput({picturesList}){
           addTag(galery.code)
         }
         if (e.key === 'Enter') {
+          const galeryValue = galeries.find(galery => galery.code === value);
+          if (galeryValue) return addTag(galeryValue.code);
           const galery = galeries.find(galery => galery.display === val)
           addTag(galery.code)
         }

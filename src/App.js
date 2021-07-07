@@ -34,8 +34,6 @@ function App() {
       setGaleries(JSON.parse(lsGaleries));
     }
   },[])
-  console.log(galeries);
-  console.log("banana");
 
   return (
     <CurrentImage.Provider value={{currentImage, setCurrentImage, currentIndex, setCurrentIndex}}>
