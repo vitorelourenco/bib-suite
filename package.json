@@ -45,7 +45,16 @@
     ],
     "directories": {
       "buildResources": "assets"
-    }
+    },
+    "extraResources": [
+    	{
+        "from": "./extraResources/",
+        "to" : "extraResources",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   },
   "eslintConfig": {
     "extends": [
