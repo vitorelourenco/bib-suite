@@ -77,6 +77,7 @@ export default function BibInput({picturesList}){
       }
       case 'Enter': {
         if (isDisabled) return;
+        if (e.repeat) return;
         const node = document.querySelector('#input-box')
         const isBoxOpen = !!node.getAttribute('aria-activedescendant')
         if (isBoxOpen) return

@@ -30,6 +30,7 @@ export default function PicturesList({
         range.map(subRange => {
           return (
             <MemoizedSubList
+              key={subRange}
               setCurrentImage={setCurrentImage}
               setCurrentIndex={setCurrentIndex}
               currentImage={currentImage}
@@ -47,6 +48,7 @@ export default function PicturesList({
 }
 
 const MemoizedSubList = React.memo(SubList,(prevProps, nextProps)=>{
+  if (prevProps.picturesList !== nextProps.picturesList) return false;
   if (nextProps.isActive) return false;
   if (prevProps.isActive !== nextProps.isActive) return false;
   return true;

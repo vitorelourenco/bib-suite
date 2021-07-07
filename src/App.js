@@ -29,7 +29,12 @@ function App() {
   },[currentImage]);
 
   useEffect(()=>{
-    const config = path.join(app.getAppPath(), "extraResources","galeries.json");
+    const configDev = path.join(app.getAppPath(), "bibConfig");
+    const configProd = path.join(app.getAppPath(), "resources", "bibConfig");
+    const isProd = fs.existsSync(configProd);
+    const config = isProd ? path.join(configProd, "galeries.json") : path.join(configDev, "galeries.json");
+
+    console.log(config);
     if (fs.existsSync(config)){
       const galeries = fs.readFileSync(config);
       setGaleries(JSON.parse(galeries));
