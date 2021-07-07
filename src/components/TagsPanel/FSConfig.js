@@ -11,8 +11,8 @@ const pathModule = window.require('path')
 const jpgRegExp = new RegExp(/(.jpg$)|(.JPG$)|(.jpeg$)|(.JPEG$)/);
 
 export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
-  const {lowResImages, setLowResImages, setHighResImages, tags, setTags} = useContext(Images);
-  const {currentImage, setCurrentImage, setCurrentIndex} = useContext(CurrentImage);
+  const {lowResImages, setLowResImages, setHighResImages, setTags} = useContext(Images);
+  const {setCurrentImage, setCurrentIndex} = useContext(CurrentImage);
 
   const [isHidden, setIsHidden] = useState(false);
   
@@ -21,6 +21,11 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
 
   useEffect(()=>{
     const lowResPaths = getJPEGsFromFolder(srcDir);
+    if (srcDir!=="" && lowResPaths?.length < 1) {
+      setSrcDir("");
+      alert(`No jpg-like images in ${srcDir}`);
+      return;
+    }
     const lowResImages = {};
     lowResPaths.forEach(path=>{
       const fullName = pathModule.basename(path);
@@ -32,6 +37,11 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile}){
 
   useEffect(()=>{
     const highResPaths = getJPEGsFromFolder(highResDir);
+    if (highResDir!=="" && highResPaths?.length < 1) {
+      setHighResDir("");
+      alert(`No jpg-like images in ${highResDir}`);
+      return;
+    }
     const highResImages = {};
     highResPaths.forEach(path=>{
       const fullName = pathModule.basename(path);

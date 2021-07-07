@@ -23,7 +23,10 @@ function createWindow() {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
-  // win.setMenu(null);
+
+  if(!isDev){
+    win.setMenu(null);
+  }
 }
 
 app.on('ready', ()=>{

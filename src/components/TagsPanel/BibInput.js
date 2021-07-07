@@ -112,7 +112,6 @@ export default function BibInput({picturesList}){
   }
 
   function next(i, len) {
-    console.log(currentIndex);
     if (i === len) return
     setCurrentIndex(currentIndex + 1)
     setCurrentImage(picturesList[currentIndex + 1])

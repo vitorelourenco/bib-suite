@@ -63,5 +63,6 @@ export function getJPEGsFromFolder(dir) {
 export function bareCSVfile(path, obj){
   const keys = Object.keys(obj);
   const str = keys.reduce((acc, item) => acc += item+";\r\n","")
+
   fs.writeFileSync(path,str)
 }

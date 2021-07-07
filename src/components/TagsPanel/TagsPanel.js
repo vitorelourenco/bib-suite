@@ -26,7 +26,6 @@ export default function TagsPanel() {
     keys.forEach(key => {
       CSVString += [key, ...tags[key]].join(';') + ';\r\n'
     })
-    CSVString += '\r\n'
     fs.writeFileSync(CSVFile, CSVString)
   }
 
