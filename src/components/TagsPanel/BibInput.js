@@ -108,7 +108,8 @@ export default function BibInput({ picturesList }) {
         break
       }
       case 'Tab': {
-        e.preventDefault()
+        e.preventDefault();
+        if (e.target.value === "") return;
         const galery = galeries.find(
           galery => galery.tabCode === e.target.value
         )
@@ -117,7 +118,6 @@ export default function BibInput({ picturesList }) {
           if(tabCallsNext) {
             setLastTag(tags[currentImage]);
             next(currentIndex, picturesList.length - 1)
-            console.log("banana");
           }
         } else {
           const node = document.querySelector('#input-box')

@@ -4,7 +4,7 @@ import { useContext, useState, useEffect} from 'react';
 import Images from '../../contexts/Images';
 import styled from 'styled-components';
 import CurrentImage from '../../contexts/CurrentImage';
-import GalleriesModal from './GalleriesModal';
+import GalleriesModal from './GalleriesModal/GalleriesModal';
 
 const fs = window.require('fs');
 const pathModule = window.require('path')
@@ -154,6 +154,7 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFi
         <h4>{CSVFile}</h4>
 
         <Button
+          className="showGalleries"
           variant="primary"
           onClick={()=>setShowGalleries(true)}
         >
@@ -188,7 +189,9 @@ const TopWrapper = styled.div`
   button, h4{
     display: ${props=>props.isHidden ? "none" : ""};
   }
-
+  .showGalleries{
+    margin-bottom: 10px;
+  }
   .always-show{
     display: block;
   }

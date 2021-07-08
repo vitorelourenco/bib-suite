@@ -1,8 +1,9 @@
 import styled from 'styled-components'
-import { Button } from '../Button'
+import { Button } from '../../Button'
 import ReactModal from 'react-modal'
-import { useContext } from 'react'
-import Images from '../../contexts/Images'
+import { useContext, useState } from 'react'
+import Images from '../../../contexts/Images'
+import AddGalleryModal from './AddGalleryModal';
 
 const electron = window.require('electron')
 const remote = electron.remote
@@ -10,24 +11,8 @@ const { dialog } = remote
 
 export default function GalleriesModal({ setShowGalleries }) {
   const { galeries, setGaleries } = useContext(Images)
-
-  function ExitModal() {
-    return (
-      <>
-        <p>Your galleries</p>
-        <div>
-          <Button variant="primary">Get JSON</Button>
-          <Button style={{marginRight:"20px"}} variant="primary">Load JSON</Button>
-          <h4
-            style={{ display:"inline", cursor: 'pointer', flexShrink: '0', height: '100%' }}
-            onClick={() => setShowGalleries(false)}
-          >
-            X
-          </h4>
-        </div>
-      </>
-    )
-  }
+  const [filter, setFilter] = useState("");
+  const [showAddGallery, setShowAddGallery] = useState(false);
 
   const activeGalleries = [];
   const inactiveGalleries = [];
@@ -40,53 +25,126 @@ export default function GalleriesModal({ setShowGalleries }) {
     }
   }
 
+  const filterRegExp = new RegExp(filter,"i")
+  const filteredActiveGalleries = activeGalleries.filter((gallery)=>{
+    if (filterRegExp.test(gallery.display)){
+      return true;
+    }
+    return false;
+  });
+  const filteredInactiveGalleries = inactiveGalleries.filter((gallery)=>{
+    if (filterRegExp.test(gallery.display)){
+      return true;
+    }
+    return false;
+  });
+
 
   return (
     <StyledModal isOpen={true} contentLabel="Galleries">
       <Header>
-        <ExitModal />
+        <div className="left-side">
+          <div>
+            <p style={{display:"inline-block", marginRight:"10px"}}>Your galleries</p>
+            <button onClick={()=>setShowAddGallery(true)} className="JSONButton">Add gallery</button>
+          </div>
+        <label htmlFor="filter">Search: </label>
+          <input id="filter" value={filter} onChange={(e)=>{setFilter(e.target.value)}} />
+        </div>
+        <div className="right-side">
+          <button className="JSONButton">Export JSON</button>
+          <button className="JSONButton" style={{marginRight:"20px"}}>Import JSON</button>
+          <h4
+            style={{ display:"inline", cursor: 'pointer', flexShrink: '0', height: '100%' }}
+            onClick={() => setShowGalleries(false)}
+          >
+            X
+          </h4>
+        </div>
       </Header>
       <p className="galleryActivity">Active galleries</p>
       <ul style={{ width: '100%' }} className="content">
-        {activeGalleries.length === 0 ? (<p>None</p>) : <TableHeader />}
-        {activeGalleries.map(galery => (
-          <GaleryRow key={galery.code} galery={galery} />
+        {filteredActiveGalleries.length === 0 ? (<p>None</p>) : <TableHeader />}
+        {filteredActiveGalleries.map((gallery) => (
+          <GalleryRow key={gallery.code} gallery={gallery} />
         ))}
       </ul>
       <br />
       <p className="galleryActivity">Inactive galleries</p>
       <ul style={{ width: '100%' }} className="content">
-        {inactiveGalleries.length === 0 ? (<p>None</p>) : <TableHeader />}
-        {inactiveGalleries.map(galery => (
-          <GaleryRow key={galery.code} galery={galery} />
+        {filteredInactiveGalleries.length === 0 ? (<p>None</p>) : <TableHeader />}
+        {filteredInactiveGalleries.map(gallery => (
+          <GalleryRow key={gallery.code} gallery={gallery} />
         ))}
       </ul>
+      {showAddGallery ? (
+        <AddGalleryModal
+          setShowAddGallery={setShowAddGallery}
+        />
+        ) : (
+          ''
+      )}
     </StyledModal>
   )
 }
 
-function GaleryRow(props) {
+function GalleryRow(props) {
   const { galeries, setGaleries } = useContext(Images)
-  const { isEnabled, title, code, tabCode } = props.galery
+  const { isEnabled, title, code, tabCode } = props.gallery
+  const gallery = props.gallery;
+
+  function updateDisplayProp(){
+    gallery["display"] = gallery["title"] + " - " + gallery["code"];
+    if (gallery["tabCode"]){
+      gallery["display"] += " - " + gallery["tabCode"]
+    }
+  }
 
   function handleKeyDown(e, prop) {
     if (e.key === 'Enter') {
-      props.galery[prop] = e.target.value
-      setGaleries([...galeries])
+      if (e.target.value !== gallery[prop]){
+        gallery[prop] = e.target.value
+        localStorage.setItem("galeries", JSON.stringify(galeries))
+        e.target.style.background = "GreenYellow";
+        window.document.body.style.pointerEvents = "none";
+        setTimeout(() => {
+          e.target.style.background = "white";
+          setGaleries([...galeries])
+          window.document.body.style.pointerEvents = "initial";
+        }, 300)
+        updateDisplayProp();
+      }
       e.target.blur()
-      localStorage.setItem("galeries", JSON.stringify(galeries))
     }
+
     if (e.key === 'Escape') {
-      e.target.value = props.galery[prop]
+      if (e.target.value !== gallery[prop]){
+        e.target.style.background = "IndianRed";
+        setTimeout(() => {
+          e.target.style.background = "white";
+        }, 300)
+      }
+      e.target.value = gallery[prop];
       e.target.blur()
     }
+  }
+
+  function handleClickOutside(e,prop){
+    if (!e.relatedTarget) return;
+    if (e.target.value !== gallery[prop]){
+      e.target.style.background = "IndianRed";
+      setTimeout(() => {
+        e.target.style.background = "white";
+      }, 300)
+    }
+    e.target.value = gallery[prop];
   }
 
   return (
     <RowWrapper>
       <input
         onClick={() => {
-          props.galery["isEnabled"] = !isEnabled
+          gallery["isEnabled"] = !isEnabled
           setGaleries([...galeries])
           localStorage.setItem("galeries", JSON.stringify(galeries))
         }}
@@ -99,18 +157,22 @@ function GaleryRow(props) {
         className="title"
         type="text"
         defaultValue={title}
+        onBlur={(e)=>handleClickOutside(e, "title")}
       />
       <input
         onKeyDown={e => handleKeyDown(e, 'code')}
         className="code"
         type="text"
         defaultValue={code}
+        onBlur={(e)=>handleClickOutside(e, "code")}
       />
       <input
         onKeyDown={e => handleKeyDown(e, 'tabCode')}
         className="tabCode"
         type="text"
         defaultValue={tabCode}
+        onBlur={(e)=>handleClickOutside(e, "tabCode")}
+
       />
       <p className="delete" onClick={()=>{
         const choice = dialog.showMessageBoxSync(this, {
@@ -120,7 +182,7 @@ function GaleryRow(props) {
           message: `Delete gallery: ${code}?`
         })
         if (choice === 0){
-          const index = galeries.indexOf(props.galery);
+          const index = galeries.indexOf(gallery);
           galeries.splice(index,1);
           setGaleries([...galeries]);
           localStorage.setItem("galeries", JSON.stringify(galeries))
@@ -155,7 +217,7 @@ const TableHeaderWrapper = styled.li`
     flex: 0 0 15%;
   }
   .checkbox {
-    flex: 0 0 20px;
+    flex: 0 0 30px;
     height: 20px;
   }
   .delete {
@@ -187,7 +249,8 @@ const RowWrapper = styled.li`
   }
 
   .checkbox {
-    flex: 0 0 20px;
+    flex: 0 0 30px;
+    transform: scale(1.6)
   }
   .title {
     flex: 1 1 50%;
@@ -228,20 +291,22 @@ const StyledModal = styled(ReactModal)`
   gap: 20px;
   overflow-y: scroll;
 
-  button {
-    width: 10ch;
-    height: 4ch;
-    :first-child {
-      margin-right: 50px;
-    }
-  }
-
   .galleryActivity{
     text-decoration: underline;
   }
 
   p {
     word-break: break-word;
+  }
+
+  label{
+    margin-right: 5px;
+    font-size: 14px;
+  }
+
+  #filter{
+    height: 30px;
+    width: 150px;
   }
 `
 
@@ -257,4 +322,29 @@ const Header = styled.header`
   margin-bottom: 8px;
   padding: 0 10px;
   word-break: break-all;
+
+  .left-side{
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+
+  .right-side{
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  .JSONButton{
+    background-color: white;
+    font-size: 12px;
+    height: 25px;
+    line-height: 18px;
+    padding: 4px;
+    border: 1px solid black;
+    border-radius: 2px;
+    margin-right: 20px;
+
+    :hover{
+      background-color: #848484;
+    }
+  }
 `
