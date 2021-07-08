@@ -4,15 +4,18 @@ import ReactModal from 'react-modal'
 import { useContext, useState } from 'react'
 import Images from '../../../contexts/Images'
 import AddGalleryModal from './AddGalleryModal';
+import ImportModal from './ImportModal';
 
 const electron = window.require('electron')
 const remote = electron.remote
 const { dialog } = remote
+const fs = window.require('fs');
 
 export default function GalleriesModal({ setShowGalleries }) {
   const { galeries, setGaleries } = useContext(Images)
   const [filter, setFilter] = useState("");
   const [showAddGallery, setShowAddGallery] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const activeGalleries = [];
   const inactiveGalleries = [];
@@ -40,6 +43,25 @@ export default function GalleriesModal({ setShowGalleries }) {
   });
 
 
+  async function exportJSON(){
+    const dialogChoice = await dialog.showSaveDialog({
+      properties: ['createDirectory'],
+      filters: [
+        {
+          name: 'JSON file',
+          extensions: ['json']
+        }
+      ]
+    })
+    if (dialogChoice.canceled) return;
+    let path = dialogChoice.filePath;
+    if (!/.json$/.test(path)){
+      path+='.json';
+    }
+    const galeries = localStorage.getItem("galeries");
+    fs.writeFileSync(path, galeries);
+  }
+
   return (
     <StyledModal isOpen={true} contentLabel="Galleries">
       <Header>
@@ -52,8 +74,8 @@ export default function GalleriesModal({ setShowGalleries }) {
           <input id="filter" value={filter} onChange={(e)=>{setFilter(e.target.value)}} />
         </div>
         <div className="right-side">
-          <button className="JSONButton">Export JSON</button>
-          <button className="JSONButton" style={{marginRight:"20px"}}>Import JSON</button>
+          <button onClick={exportJSON} className="JSONButton">Export JSON</button>
+          <button onClick={()=>setShowImportModal(true)} className="JSONButton" style={{marginRight:"20px"}}>Import JSON</button>
           <h4
             style={{ display:"inline", cursor: 'pointer', flexShrink: '0', height: '100%' }}
             onClick={() => setShowGalleries(false)}
@@ -80,6 +102,13 @@ export default function GalleriesModal({ setShowGalleries }) {
       {showAddGallery ? (
         <AddGalleryModal
           setShowAddGallery={setShowAddGallery}
+        />
+        ) : (
+          ''
+      )}
+      {showImportModal ? (
+        <ImportModal
+          setShowImportModal={setShowImportModal}
         />
         ) : (
           ''

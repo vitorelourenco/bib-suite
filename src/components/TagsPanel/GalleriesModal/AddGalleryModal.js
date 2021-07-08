@@ -3,6 +3,8 @@ import { Button } from '../../Button'
 import ReactModal from 'react-modal'
 import { useContext, useState } from 'react'
 import Images from '../../../contexts/Images'
+import { useRef } from 'react'
+import { useEffect } from 'react'
 
 export default function GalleriesModal({ setShowAddGallery }) {
   return (
@@ -31,6 +33,8 @@ export default function GalleriesModal({ setShowAddGallery }) {
 }
 
 function GalleryRow({setShowAddGallery}) {
+  const ref = useRef(null);
+  
   const { galeries, setGaleries } = useContext(Images);
 
   const [gallery, setGallery] = useState({
@@ -68,10 +72,15 @@ function GalleryRow({setShowAddGallery}) {
     setShowAddGallery(false);
   }
 
+  useEffect(()=>{
+    ref.current?.focus();
+  },[ref])
+
   return (
     <>
     <RowWrapper>
       <input
+        ref={ref}
         className="title"
         type="text"
         value={gallery.title}
