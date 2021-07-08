@@ -49,6 +49,19 @@ function GalleryRow({setShowAddGallery}) {
   }
 
   function handleAddGallery(){
+    const codes = [];
+    const tabCodes = []
+    
+    for (let i=0; i<galeries.length; i++){
+      codes.push(galeries[i].code);
+      tabCodes.push(galeries[i].tabCode);
+    }
+
+    if (gallery.title === "") return alert("Description can't be empty");
+    if (gallery.code === "") return alert("Code can't be empty");
+    if (codes.includes(gallery.code)) return alert("Code is already being used");
+    if (gallery.tabCode !== "" && tabCodes.includes(gallery.tabCode)) return alert("TabCode is already being used");
+
     galeries.unshift(gallery);
     localStorage.setItem("galeries", JSON.stringify(galeries))
     setGaleries([...galeries]);

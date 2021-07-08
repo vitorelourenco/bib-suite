@@ -102,6 +102,28 @@ function GalleryRow(props) {
 
   function handleKeyDown(e, prop) {
     if (e.key === 'Enter') {
+
+      const codes = [];
+      const tabCodes = []
+      
+      for (let i=0; i<galeries.length; i++){
+        codes.push(galeries[i].code);
+        tabCodes.push(galeries[i].tabCode);
+      }
+  
+      if (prop === "title"){
+        if (e.target.value === "") return alert("Description can't be empty");
+      }
+
+      if (prop === "code"){
+        if (e.target.value === "") return alert("Code can't be empty");
+        if (codes.includes(e.target.value)) return alert("Code is already being used");
+      }
+
+      if (prop === "tabCode"){
+        if (e.target.value !== "" && tabCodes.includes(e.target.value)) return alert("TabCode is already being used");
+      }
+
       if (e.target.value !== gallery[prop]){
         gallery[prop] = e.target.value
         localStorage.setItem("galeries", JSON.stringify(galeries))
