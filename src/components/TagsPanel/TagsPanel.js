@@ -9,6 +9,7 @@ import Images from '../../contexts/Images'
 import BibList from './BibList'
 import { Button } from '../Button'
 import ConfirmationModal from './ConfirmationModal'
+import { saveFilePathAsync } from '../../helper_functions/fileHandling'
 const fs = window.require('fs')
 
 export default function TagsPanel() {
@@ -27,6 +28,20 @@ export default function TagsPanel() {
       CSVString += [key, ...tags[key]].join(';') + ';\r\n'
     })
     fs.writeFileSync(path, CSVString)
+  }
+
+  function exportCleanCSV(){
+    saveFilePathAsync().then(path=>{
+      const keys = Object.keys(tags)
+      let CSVString = ''
+      keys.forEach(key => {
+        if (tags[key].length !== 0){
+          CSVString += [key, ...tags[key]].join(';') + ';\r\n';
+        }
+      })
+      fs.writeFileSync(path, CSVString)
+      alert("done");
+    }).catch(err=>alert(err))
   }
 
   return (
@@ -56,16 +71,18 @@ export default function TagsPanel() {
         ''
       )}
       <BibList></BibList>
+
+      <Button
+        onClick={exportCleanCSV}
+        className="export"
+        variant="include"
+      >
+        Export <strong>clean</strong> CSV
+      </Button>
+
       <Button
         onClick={() => setShowConfirmation(true)}
         className="save"
-        variant="include"
-      >
-        Save to current CSV
-      </Button>
-      <Button
-        onClick={() => setShowConfirmation(true)}
-        className="export"
         variant="include"
       >
         Save to current CSV

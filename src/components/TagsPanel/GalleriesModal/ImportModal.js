@@ -37,6 +37,7 @@ export default function GalleriesModal({ setShowImportModal, setShowGalleries })
   }
 
   function executeImport(){
+    if (!importFile) return alert("Select a valid import file")
     try{
       const dict = {};
       galeries.forEach((gal)=>{
@@ -125,8 +126,8 @@ export default function GalleriesModal({ setShowImportModal, setShowGalleries })
       setTimeout(()=>{
         setShowGalleries(true);
       },0)
-    } catch(e) {
-      console.log(e);
+    } catch(err) {
+      alert(err);
     }
   }
 
