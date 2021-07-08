@@ -14,7 +14,7 @@ const fs = window.require('fs')
 const pathModule = window.require('path')
 
 
-export default function GalleriesModal({ setShowImportModal }) {
+export default function GalleriesModal({ setShowImportModal, setShowGalleries }) {
   const {galeries, setGaleries} = useContext(Images);
 
   const [descriptionOption, setDescriptionOption] = useState(null);
@@ -64,16 +64,17 @@ export default function GalleriesModal({ setShowImportModal }) {
           (()=>{
             if(activityOption === "ignore") return prepGal["isEnabled"] = dict[gal.code].isEnabled;
             if(activityOption === "merge"){
-              if (!dict[gal.code].isEnabled && gal.isEnabled) return prepGal["isEnabled"] = true;
-              else return prepGal["isEnabled"] = false;
+              if (dict[gal.code].isEnabled) return prepGal["isEnabled"] = true;
+              else return prepGal["isEnabled"] = gal.isEnabled;
             }
             if (activityOption === "replace") return prepGal["isEnabled"] = gal.isEnabled;
           })();
 
           //tabCode options
           (()=>{
-            if(tabCodeOption === "ignore") return prepGal["tabCode"] = "";
+            if(tabCodeOption === "ignore") return prepGal["tabCode"] = dict[gal.code].tabCode;
             if(tabCodeOption === "merge"){
+              //tabcode could be empty at source so we are checking that
               if (dict[gal.code].tabCode) return prepGal["tabCode"] = dict[gal.code].tabCode;
               else return prepGal["tabCode"] = gal.tabCode;
             }
@@ -82,6 +83,9 @@ export default function GalleriesModal({ setShowImportModal }) {
 
           dict[gal.code] = prepGal;
         } else {
+          if (tabCodeOption === "ignore") gal.tabCode = "";
+          if (activityOption === "ignore") gal.isEnabled = false;
+
           const {isEnabled, title, display, tabCode} = gal;
           dict[gal.code] = {isEnabled, title, display, tabCode};
         }
@@ -113,7 +117,14 @@ export default function GalleriesModal({ setShowImportModal }) {
 
       setGaleries(updatedGalleries);
       localStorage.setItem("galeries", JSON.stringify(updatedGalleries));
-
+      alert("done");
+      //force refresh
+      setShowImportModal(false);
+      setShowGalleries(false);
+      //event loop hacks
+      setTimeout(()=>{
+        setShowGalleries(true);
+      },0)
     } catch(e) {
       console.log(e);
     }

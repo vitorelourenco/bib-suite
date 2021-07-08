@@ -58,6 +58,13 @@ export default function TagsPanel() {
       <BibList></BibList>
       <Button
         onClick={() => setShowConfirmation(true)}
+        className="save"
+        variant="include"
+      >
+        Save to current CSV
+      </Button>
+      <Button
+        onClick={() => setShowConfirmation(true)}
         className="export"
         variant="include"
       >
@@ -86,10 +93,18 @@ const TopWrapper = styled.div`
     overflow-y: scroll;
   }
 
-  .export {
+  .save {
     position: absolute;
     left: 0;
     bottom: 0px;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .export {
+    position: absolute;
+    left: 0;
+    bottom: 28px;
     width: 100%;
     border-radius: 0;
   }

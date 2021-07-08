@@ -5,6 +5,7 @@ import { useContext, useState } from 'react'
 import Images from '../../../contexts/Images'
 import AddGalleryModal from './AddGalleryModal';
 import ImportModal from './ImportModal';
+import { useEffect } from 'react'
 
 const electron = window.require('electron')
 const remote = electron.remote
@@ -62,6 +63,19 @@ export default function GalleriesModal({ setShowGalleries }) {
     fs.writeFileSync(path, galeries);
   }
 
+  async function clearDatabase(){
+    const choice = dialog.showMessageBoxSync(this, {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Confirm',
+      message: 'Clear database? This process is irreversible'
+    })
+    if (choice === 0) {
+      setGaleries([]);
+      localStorage.setItem("galeries",JSON.stringify([]));
+    }
+  }
+
   return (
     <StyledModal isOpen={true} contentLabel="Galleries">
       <Header>
@@ -74,6 +88,7 @@ export default function GalleriesModal({ setShowGalleries }) {
           <input id="filter" value={filter} onChange={(e)=>{setFilter(e.target.value)}} />
         </div>
         <div className="right-side">
+          <button onClick={clearDatabase} className="JSONButton">Clear database</button>
           <button onClick={exportJSON} className="JSONButton">Export JSON</button>
           <button onClick={()=>setShowImportModal(true)} className="JSONButton" style={{marginRight:"20px"}}>Import JSON</button>
           <h4
@@ -108,6 +123,7 @@ export default function GalleriesModal({ setShowGalleries }) {
       )}
       {showImportModal ? (
         <ImportModal
+          setShowGalleries={setShowGalleries}
           setShowImportModal={setShowImportModal}
         />
         ) : (

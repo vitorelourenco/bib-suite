@@ -98,7 +98,6 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFi
     }
   },[inputCount])
 
-  console.log(showGalleries);
   return (
     <TopWrapper isHidden={isHidden}>
         <Button
