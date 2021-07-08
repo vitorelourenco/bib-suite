@@ -1,11 +1,9 @@
 import styled from 'styled-components'
-import { Button } from '../../Button'
 import ReactModal from 'react-modal'
 import { useContext, useState } from 'react'
 import Images from '../../../contexts/Images'
 import AddGalleryModal from './AddGalleryModal';
 import ImportModal from './ImportModal';
-import { useEffect } from 'react'
 
 const electron = window.require('electron')
 const remote = electron.remote

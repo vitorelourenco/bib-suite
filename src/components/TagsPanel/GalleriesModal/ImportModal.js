@@ -1,17 +1,13 @@
 import styled from 'styled-components'
-import { Button } from '../../Button'
 import ReactModal from 'react-modal'
 import { useContext, useState } from 'react'
 import Images from '../../../contexts/Images'
-import { useRef } from 'react'
-import { useEffect } from 'react'
 
 const electron = window.require('electron')
 const remote = electron.remote
 const { dialog } = remote
 
 const fs = window.require('fs')
-const pathModule = window.require('path')
 
 
 export default function GalleriesModal({ setShowImportModal, setShowGalleries }) {
