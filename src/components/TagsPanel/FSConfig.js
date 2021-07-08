@@ -4,6 +4,7 @@ import { useContext, useState, useEffect} from 'react';
 import Images from '../../contexts/Images';
 import styled from 'styled-components';
 import CurrentImage from '../../contexts/CurrentImage';
+import GalleriesModal from './GalleriesModal';
 
 const fs = window.require('fs');
 const pathModule = window.require('path')
@@ -19,6 +20,7 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFi
   const [srcDir, setSrcDir] = useState("");
   const [highResDir, setHighResDir] = useState("");
   const [inputCount, setInputCount] = useState(0);
+  const [showGalleries, setShowGalleries] = useState(false);
 
   useEffect(()=>{
     const lowResPaths = getJPEGsFromFolder(srcDir);
@@ -96,6 +98,7 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFi
     }
   },[inputCount])
 
+  console.log(showGalleries);
   return (
     <TopWrapper isHidden={isHidden}>
         <Button
@@ -151,6 +154,13 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFi
         <h4>{CSVFile}</h4>
 
         <Button
+          variant="primary"
+          onClick={()=>setShowGalleries(true)}
+        >
+          Galleries
+        </Button>
+
+        <Button
           className="always-show"
           variant={isHidden ? "include" : "ditch"}
           onClick={() =>
@@ -159,6 +169,13 @@ export default function FSConfig({setPicturesList, setCSVFile, CSVFile, saveToFi
         >
           {isHidden ? "Show FS Options" : "Hide FS Options"}
         </Button>
+        {showGalleries ? (
+          <GalleriesModal
+            setShowGalleries={setShowGalleries}
+          />
+          ) : (
+            ''
+        )}
       </TopWrapper>
   )
 }
